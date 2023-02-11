@@ -318,7 +318,11 @@ def _on_message(client, userdata, msg):
 
     for topic in userdata.keys():
         if _topic_matches(topic, msg.topic):
-            _update_metrics(userdata[topic], msg)
+             if 'msg-jpath' in config_from_file:
+                msg.payload 
+                _update_metrics(userdata[topic], msg)
+             else:        
+                 _update_metrics(userdata[topic], msg)
 
 
 def _mqtt_init(mqtt_config, metrics):

@@ -17,6 +17,7 @@ import prometheus_client as prometheus
 from yamlreader import yaml_load
 import utils.prometheus_additions
 import version
+import jsonPath
 
 VERSION = version.__version__
 SUFFIXES_PER_TYPE = {

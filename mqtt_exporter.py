@@ -17,7 +17,7 @@ import prometheus_client as prometheus
 from yamlreader import yaml_load
 import utils.prometheus_additions
 import version
-import jsonPath
+from jsonpath_ng import jsonpath, parse
 
 VERSION = version.__version__
 SUFFIXES_PER_TYPE = {
@@ -318,8 +318,16 @@ def _on_message(client, userdata, msg):
 
     for topic in userdata.keys():
         if _topic_matches(topic, msg.topic):
-             if 'msg-jpath' in config_from_file:
-                msg.payload 
+
+             if userdata[topic][0]['msgJpath']:
+                jpath = userdata[topic][0]['msgJpath']
+                payload = json.loads(msg.payload)
+                data = json.dumps(payload[jpath])
+                
+                msg.payload = str(f"{data}").encode('utf-8')
+                logging.debug(
+                     f'_on_message Msg received on topic: {msg.topic}, JSON Value: {str(msg.payload)}')
+
                 _update_metrics(userdata[topic], msg)
              else:        
                  _update_metrics(userdata[topic], msg)
@@ -330,7 +338,7 @@ def _mqtt_init(mqtt_config, metrics):
     mqtt_client = mqtt.Client(userdata=metrics)
     mqtt_client.on_connect = _on_connect
     mqtt_client.on_message = _on_message
-
+    
     if 'auth' in mqtt_config:
         auth = _strip_config(mqtt_config['auth'], ['username', 'password'])
         mqtt_client.username_pw_set(**auth)
@@ -584,6 +592,7 @@ def main():
         sys.exit(1)
 
     # Set up mqtt client and loop forever
+    print(config)
     mqtt_client = _mqtt_init(config['mqtt'], config['metrics'])
     mqtt_client.loop_forever()
 

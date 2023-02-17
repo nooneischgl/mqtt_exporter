@@ -2,9 +2,9 @@ FROM python:3.11.1-alpine
 
 LABEL org.opencontainers.image.title=mqtt_exporter
 LABEL org.opencontainers.image.description="Prometheus exporter for MQTT."
-LABEL org.opencontainers.image.vendor="Frederic Hemberger"
+LABEL org.opencontainers.image.vendor="Frederic Hemberger/Chase Gleason"
 LABEL org.opencontainers.image.licenses=MIT
-LABEL org.opencontainers.image.source=https://github.com/fhemberger/mqtt_exporter
+LABEL org.opencontainers.image.source=https://github.com/nooneischgl/mqtt_exporter
 
 WORKDIR /usr/src/app
 

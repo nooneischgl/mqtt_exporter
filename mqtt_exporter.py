@@ -17,7 +17,7 @@ import prometheus_client as prometheus
 from yamlreader import yaml_load
 import utils.prometheus_additions
 import version
-from jsonpath_ng import jsonpath, parse
+
 
 VERSION = version.__version__
 SUFFIXES_PER_TYPE = {
@@ -27,6 +27,7 @@ SUFFIXES_PER_TYPE = {
     "summary": ['sum', 'count'],
     "histogram": ['sum', 'count', 'bucket'],
     "enum": [],
+    "bool":[],
 }
 
 
@@ -367,6 +368,7 @@ def _export_to_prometheus(name, metric, labels):
                        'summary': SummaryWrapper,
                        'histogram': HistogramWrapper,
                        'enum': EnumWrapper,
+                       'bool': BoolWrapper,
                     }
     valid_types = metric_wrappers.keys()
     if metric['type'] not in valid_types:
@@ -444,6 +446,24 @@ class GaugeWrapper():
             name, help_text, list(label_names)
         )
     def update(self, label_values, value):
+        child = self.metric.labels(*label_values)
+        child.set(value)
+        return child
+    
+class BoolWrapper():
+    """
+    Wrapper to provide interface to Gauge metric specific to converting String Bool True or False to 1 or 0
+    """
+    def __init__(self, name, help_text, label_names, *args, **kwargs) -> None:
+        self.metric = prometheus.Gauge(
+            name, help_text, list(label_names)
+        )
+    def update(self, label_values, value):
+        if str(value).lower() == "true":
+            value = 1
+        elif str(value).lower() == "false":
+            value = 0
+        
         child = self.metric.labels(*label_values)
         child.set(value)
         return child

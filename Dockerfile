@@ -15,6 +15,5 @@ RUN pip install --no-cache-dir -r requirements-frozen.txt
 
 USER mqtt_exporter
 
-
 EXPOSE 9344
 ENTRYPOINT [ "/usr/local/bin/python3", "-u", "/usr/src/app/mqtt_exporter.py" ]
